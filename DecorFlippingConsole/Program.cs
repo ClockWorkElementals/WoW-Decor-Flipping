@@ -16,16 +16,21 @@ await ProcessRepositoriesAsync(client, realmDataRequest);
 static async Task ProcessRepositoriesAsync(HttpClient client, string realmDataRequest)
 {
     var result = await client.GetStringAsync(realmDataRequest);
-    Console.WriteLine(result);
 
     //Convert string into JSON
     Root deserialized = JsonSerializer.Deserialize<Root>(result);
     Console.WriteLine("Successful Deserialization.");
-    Console.WriteLine(deserialized.result.ToString());
+    
+}
 
-    foreach(Realm realm in deserialized.result.realms) Console.WriteLine(realm);
-
-
+static void PrintUSRealms(Root deserialized)
+{
+    //US Realms specifically
+    List<Realm> USRealms = deserialized.result.USRealms();
+    foreach (var realm in USRealms)
+    {
+        Console.WriteLine(realm.ToString());
+    }
     Console.ReadLine();
 }
 
@@ -35,6 +40,13 @@ static async Task ProcessRepositoriesAsync(HttpClient client, string realmDataRe
         public string region { get; set; }
         public string slug { get; set; }
         public string name { get; set; }
+
+    //Methods
+    public override string ToString()
+    {
+        return $"Name: {name} | Region: {region}";
+    }
+
     }
     public class Request
     {
@@ -44,6 +56,18 @@ static async Task ProcessRepositoriesAsync(HttpClient client, string realmDataRe
     {
         public DateTime lastUpdated { get; set; }
         public List<Realm> realms { get; set; }
+
+        //Methods
+
+        public List<Realm> USRealms()
+        {
+            List<Realm> US = [];
+            foreach (Realm currentRealm in realms)
+            {
+                if(currentRealm.region == "us") US.Add(currentRealm);
+            }
+            return US;
+        }
     }
     public class Root
     {

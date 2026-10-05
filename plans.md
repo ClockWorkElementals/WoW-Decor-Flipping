@@ -15,7 +15,7 @@
   - I have the names of the realms I intend on looking at
 
 ## Steps
-  - Make sure the API fuckin works and I can use it lmao
+  - ~~Make sure the API fuckin works and I can use it lmao~~
     - I've got to add API key to header
   - Make sure I can call the API on specific item IDs in a modular enough way for better expansion
   - Parse the return data cleanly to find cheapest realm from the item and to find prices on my realms for said item

@@ -6,39 +6,50 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System;
 using DFCI = DecorFlippingConsoleItems;
+using DFCS = DecorFlippingConsoleShopping;
 
 namespace DecorFlippingConsole
 {
     class Program {
         
         public static Dictionary<string,string> DecorNamesandIDs = new Dictionary<string,string>();
+        public static DFCS.FullShoppingList fullList = new DFCS.FullShoppingList();
         private static async Task Main(string[] args)
         {
-            initalizeNamesAndIDs();
+            InitalizeNamesAndIDs();
+            
             //Setting up call authority
             var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", $"ApiKey {config["UndermineExchangeAPIKey"]}");
             //await RealmInfo(client);
-            //await ItemInfo(client);
-
+            await ItemInfo(client);
         }
 
         #region Items
         static async Task ItemInfo(HttpClient client)
         {
             List<string> inputIDs = GetInputIDs();
-            Console.WriteLine($"Testing, inputIDs is still {inputIDs.Count} entries long.");
             foreach (var id in inputIDs)
             {
-                Console.WriteLine($"current id is {id}");
                 string itemDataRequest = $"https://api.undermine.exchange/v1/region/us/items/{id}/now.json";
                 var result = await client.GetStringAsync(itemDataRequest);
-                DFCI.Root deserialized = JsonSerializer.Deserialize<DFCI.Root>(result);
-                PrintRealmsByPrice(deserialized);
-                Console.WriteLine("-----------------------------------------------------");
+                DFCI.Root root = JsonSerializer.Deserialize<DFCI.Root>(result);
+                List<DFCI.Result> realms = root.orderbyPrice();
+                ShoppingListAddition(realms[0], id);
             }
+            Console.WriteLine(fullList);
         }
+
+        static void ShoppingListAddition(DFCI.Result cheapestRealm, string itemID)
+        {
+            string realmName = cheapestRealm.realms[0];
+            string itemName = LookUpNameByID(itemID);
+            long realPrice = cheapestRealm.price / 10000;
+            DFCS.ShoppingItem item = new DFCS.ShoppingItem(itemName, itemID, realPrice);
+            fullList.AddItemToFullList(realmName, item);
+        }
+
         //TODO: Prolly just kinda remove this and redo entirely.
         static void PrintRealmsByPrice(DFCI.Root root)
         {
@@ -74,7 +85,6 @@ namespace DecorFlippingConsole
             return IDs;
         }
         #endregion
-
         
         #region Realms
         //Getting all Realms Stuff for easy, cheap testing
@@ -101,7 +111,8 @@ namespace DecorFlippingConsole
         }
         #endregion Realms
         
-        private static void initalizeNamesAndIDs()
+        #region Dictionary Setup
+        private static void InitalizeNamesAndIDs()
         {
             //Read DecorNamesAndIDs.ods until we find the string with the id in it.
             using (StreamReader stream = new StreamReader("./DecorNamesAndIDs.csv"))
@@ -110,11 +121,17 @@ namespace DecorFlippingConsole
                 while((line = stream.ReadLine()) != null)
                 {
                     string[] split = line.Split(",");
-                    DecorNamesandIDs.Add(split[0], split[1]);
+                    //Key should be ID, Value should be Name. I typed the doc backwards.
+                    DecorNamesandIDs.Add(split[1], split[0]);
                 }
             }
-            Console.WriteLine(DecorNamesandIDs.Count);
         }
+
+        public static string LookUpNameByID(string num)
+        {
+            return DecorNamesandIDs.GetValueOrDefault(num);
+        }
+        #endregion
     }
     
 }

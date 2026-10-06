@@ -11,8 +11,8 @@ namespace DecorFlippingConsoleItems
     {
         //public DateTime lastUpdated { get; set; }
         //public DateTime lastSeen { get; set; }
-        public int price { get; set;  }
-        public int quantity { get; set; }
+        public long price { get; set;  }
+        public long quantity { get; set; }
         public List<string> realms { get; set; }
 
         public override string ToString()

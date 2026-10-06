@@ -33,9 +33,10 @@ namespace DecorFlippingConsole
                 var result = await client.GetStringAsync(itemDataRequest);
                 DFCI.Root deserialized = JsonSerializer.Deserialize<DFCI.Root>(result);
                 PrintRealmsByPrice(deserialized);
-                Console.WriteLine("-----------------------------------------------");
+                Console.WriteLine("-----------------------------------------------------");
             }
         }
+        //TODO: Prolly just kinda remove this and redo entirely.
         static void PrintRealmsByPrice(DFCI.Root root)
         {
             List<DFCI.Result> realms = root.orderbyPrice();

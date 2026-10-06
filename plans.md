@@ -18,12 +18,24 @@
   - ~~Make sure the API fuckin works and I can use it lmao~~
     - I've got to add API key to header
   - ~~Make sure I can call the API on specific item IDs in a modular enough way for better expansion~~
-  - Parse the return data cleanly to find cheapest realm from the item and to find prices on my realms for said item
+  - ~~Parse the return data cleanly to find cheapest realm from the item and to find prices on my realms for said item~~
     - Last 4 digits are for silver and copper, so find a way to truncate number to just gold
     - Might also help if there's a way to guarantee we find multiples at small price just in case we need multiples of the item
   - Once my outputs are good, work on making inputs better. I don't want to have to search something in the spreadsheet to find my item ids, and I want to query
     multiple things at once.
   - Shopping list on a per-realm basis. If 6 of the things are going to be grabbed off one realm, I want those items and their costs shown together.
     - Buying happens all at once. 3 things to AP, 2 to MG, 1 to WRA should generate a list of 6 to buy
+    - I want to see profits between the realm i'm shopping from and what i'm posting to
   - UI time? Then determine if this should be an addon. If an addon, maybe that'll be cleaner to generate shopping list and keep track of warehouse. Addon is MUCH later work
   - Eat shit and die, JS. We're going for ANYTHING else. C# is calling my name
+
+
+## Shopping List
+  - What do we need? I think Shopping List is a list of RealmShoppingLists
+    - RealmShoppingLists are:
+      - Name
+      - Items
+        - ID
+        - Game Name (Should be able to find name through ID)
+        - Price
+      - Total Price (for all items, add price together)

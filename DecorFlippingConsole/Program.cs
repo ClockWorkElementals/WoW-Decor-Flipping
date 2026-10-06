@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Net.Http;
 using System.Text.Json;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System;
 using DFCI = DecorFlippingConsoleItems;
@@ -10,14 +11,16 @@ namespace DecorFlippingConsole
 {
     class Program {
         
+        public static Dictionary<string,string> DecorNamesandIDs = new Dictionary<string,string>();
         private static async Task Main(string[] args)
         {
+            initalizeNamesAndIDs();
             //Setting up call authority
             var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", $"ApiKey {config["UndermineExchangeAPIKey"]}");
             //await RealmInfo(client);
-            await ItemInfo(client);
+            //await ItemInfo(client);
 
         }
 
@@ -98,6 +101,20 @@ namespace DecorFlippingConsole
         }
         #endregion Realms
         
+        private static void initalizeNamesAndIDs()
+        {
+            //Read DecorNamesAndIDs.ods until we find the string with the id in it.
+            using (StreamReader stream = new StreamReader("./DecorNamesAndIDs.csv"))
+            {
+                string line;
+                while((line = stream.ReadLine()) != null)
+                {
+                    string[] split = line.Split(",");
+                    DecorNamesandIDs.Add(split[0], split[1]);
+                }
+            }
+            Console.WriteLine(DecorNamesandIDs.Count);
+        }
     }
     
 }

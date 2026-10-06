@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using System;
+using DFCI = DecorFlippingConsoleItems;
 
 namespace DecorFlippingConsole
 {
@@ -15,15 +16,41 @@ namespace DecorFlippingConsole
             var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", $"ApiKey {config["UndermineExchangeAPIKey"]}");
-            
-            List<string> inputIDs = GetInputIDs();
+            //await RealmInfo(client);
+            await ItemInfo(client);
 
         }
 
         #region Items
-        static async void ItemInfo(HttpClient client)
+        static async Task ItemInfo(HttpClient client)
         {
-            
+            List<string> inputIDs = GetInputIDs();
+            Console.WriteLine($"Testing, inputIDs is still {inputIDs.Count} entries long.");
+            foreach (var id in inputIDs)
+            {
+                Console.WriteLine($"current id is {id}");
+                string itemDataRequest = $"https://api.undermine.exchange/v1/region/us/items/{id}/now.json";
+                var result = await client.GetStringAsync(itemDataRequest);
+                DFCI.Root deserialized = JsonSerializer.Deserialize<DFCI.Root>(result);
+                PrintRealmsByPrice(deserialized);
+                Console.WriteLine("-----------------------------------------------");
+            }
+        }
+        static void PrintRealmsByPrice(DFCI.Root root)
+        {
+            List<DFCI.Result> realms = root.orderbyPrice();
+            Console.WriteLine(realms[0].ToString());
+
+            List<string> myRealms = ["aggramar", "aerie-peak", "moon-guard", "wyrmrest-accord", "area-52"];
+            foreach (var realm in realms)
+            {
+                foreach (var myRealm in myRealms)
+                {
+                    if(realm.realms.Contains(myRealm))
+                        Console.WriteLine(realm.ToString());
+                    
+                }
+            }
         }
 
         //TODO: Make this cleaner for safe inputs
@@ -44,9 +71,10 @@ namespace DecorFlippingConsole
         }
         #endregion
 
+        
         #region Realms
         //Getting all Realms Stuff for easy, cheap testing
-        static async void RealmInfo(HttpClient client)
+        static async Task RealmInfo(HttpClient client)
         {
             string realmDataRequest = "https://api.undermine.exchange/v1/static/realms.json";
             var result = await client.GetStringAsync(realmDataRequest);
@@ -54,6 +82,7 @@ namespace DecorFlippingConsole
             Root deserialized = JsonSerializer.Deserialize<Root>(result);
             Console.WriteLine("Successful Deserialization.");
             PrintUSRealms(deserialized);
+            return;
         }
         //More Realms testing
         static void PrintUSRealms(Root deserialized)
@@ -67,6 +96,7 @@ namespace DecorFlippingConsole
             Console.ReadLine();
         }
         #endregion Realms
+        
     }
     
 }

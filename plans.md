@@ -17,7 +17,7 @@
 ## Steps
   - ~~Make sure the API fuckin works and I can use it lmao~~
     - I've got to add API key to header
-  - Make sure I can call the API on specific item IDs in a modular enough way for better expansion
+  - ~~Make sure I can call the API on specific item IDs in a modular enough way for better expansion~~
   - Parse the return data cleanly to find cheapest realm from the item and to find prices on my realms for said item
     - Last 4 digits are for silver and copper, so find a way to truncate number to just gold
     - Might also help if there's a way to guarantee we find multiples at small price just in case we need multiples of the item
